@@ -1,6 +1,8 @@
 using Game.Enum;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class RPCManager : MonoBehaviourPunCallbacks
 {
@@ -21,6 +23,11 @@ public class RPCManager : MonoBehaviourPunCallbacks
 
             return _instance;
         }
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        PhotonNetwork.LoadLevel("Start");
     }
 
     [PunRPC]

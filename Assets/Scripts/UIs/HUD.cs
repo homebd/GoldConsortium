@@ -77,6 +77,7 @@ public class HUD : UIBase
                 2 => "가공소",
                 3 => "공장",
                 4 => "휴식",
+                _ => "로비"
             };
         }
         else

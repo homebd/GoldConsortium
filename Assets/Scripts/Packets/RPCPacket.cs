@@ -53,6 +53,11 @@ public static class RPCPacketFactory
                 return new ChangeMoneyPacket(
                     (int)parameters[0],
                     (int)parameters[1]);
+
+            case PacketType.UpdatePhase:
+                return new UpdatePhasePacket(
+                    (int)parameters[0],
+                    (Phase)parameters[1]);
         }
 
         return null;

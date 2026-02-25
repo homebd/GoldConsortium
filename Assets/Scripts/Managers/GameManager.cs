@@ -41,7 +41,7 @@ public class GameManager : Singleton<GameManager>
         AddListener(Phase.GoHome, true, () => _travelCount++);
         AddListener(Phase.Vote, true, () => _travelCount = 0);
         AddListener(Phase.Calculate, true, CaculateMoney);
-        AddListener(Phase.RoundResult, false, () => { Benefits.Clear(); Shippers.Clear(); Round++; SetLeader(); UIManager.Instance.hud.Init(); });
+        AddListener(Phase.RoundResult, false, () => { _products.Clear(); Benefits.Clear(); Shippers.Clear(); Round++; SetLeader(); UIManager.Instance.hud.Init(); });
     }
 
     public void InitPlayers()
@@ -88,7 +88,7 @@ public class GameManager : Singleton<GameManager>
     }
 
     public void SetLeader(int actorNumber) => RPCPacketFactory.Create(PacketType.SetLeader, actorNumber).Send();
-    public void ChangeMoney(int money) => RPCPacketFactory.Create(PacketType.ChangeMoney, _actorNumber, money).Send();
+    public void ChangeMoney(int actorNumber, int money) => RPCPacketFactory.Create(PacketType.ChangeMoney, actorNumber, money).Send();
     public void ChangeIcon(int sprite) => RPCPacketFactory.Create(PacketType.ChangeIcon, _actorNumber, sprite).Send();
     public void DeliverSelectionArray(int[] selectionArr) => RPCPacketFactory.Create(PacketType.VoteConfirm, _actorNumber, selectionArr).Send();
     public void ClickArea(int index) => RPCPacketFactory.Create(PacketType.TravelSelection, _actorNumber, index).Send();
@@ -141,7 +141,7 @@ public class GameManager : Singleton<GameManager>
             selected &= p.hasSelected;
         }
 
-        if (selected) { } //¹Ù·Î ½ÃÀÛ?
+        if (selected) { } //ï¿½Ù·ï¿½ ï¿½ï¿½ï¿½ï¿½?
     }
     public void SetPhase(Phase phase)
     {
@@ -188,7 +188,7 @@ public class GameManager : Singleton<GameManager>
         foreach (var player in Players)
         {
             if (Shippers.Contains(player.ActorNumber))
-                ChangeMoney(v / Shippers.Count);
+                ChangeMoney(player.ActorNumber, v / Shippers.Count);
         }
     }
 

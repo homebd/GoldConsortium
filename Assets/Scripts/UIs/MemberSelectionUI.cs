@@ -20,11 +20,14 @@ public class MemberSelectionUI : PhaseUI
         int i = 0;
         foreach (var player in GameManager.Instance.Players)
         {
-            _playerInfos[i].gameObject.SetActive(true);
-            _playerInfos[i].UpdateIcon(player.Icon);
-            _playerInfos[i].UpdateName(player.Name);
-            _playerInfos[i].UpdateMoney(player.Money);
-            _playerInfos[i].Button.onClick.AddListener(() => SelectionArray(player.ActorNumber));
+            var info = _playerInfos[i];
+
+            info.gameObject.SetActive(true);
+            info.UpdateIcon(player.Icon);
+            info.UpdateName(player.Name);
+            info.UpdateMoney(player.Money);
+            info.Button.onClick.AddListener(() => SelectionArray(player.ActorNumber));
+            info.Button.onClick.AddListener(() => info.Button.interactable = false);
 
             i++;
         }
@@ -40,6 +43,11 @@ public class MemberSelectionUI : PhaseUI
         for(int i = 0; i < selectionArr.Length; i++)
         {
             selectionArr[i] = -1;
+        }
+
+        for (int i = 0; i < _playerInfos.Count; i++)
+        {
+            _playerInfos[i].Button.interactable = true;
         }
 
         UpdateCount();

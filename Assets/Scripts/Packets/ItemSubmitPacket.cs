@@ -32,29 +32,27 @@ public class ItemSubmitPacket : RPCPacket
         if (!PhotonNetwork.IsMasterClient) return false;
         
         var player = GameManager.Instance.FindPlayer(ActorNumber);
-        if (player.ActorNumber != GameManager.Instance.Player.ActorNumber)
+
+        if (!player.HasShipTicket) return false;
+
+        Dictionary<int, int> count = new Dictionary<int, int>();
+
+        // 인벤토리 개수 세기
+        foreach (int item in player.Inventory)
         {
-            if (!player.HasShipTicket) return false;
+            if (!count.ContainsKey(item))
+                count[item] = 0;
 
-            Dictionary<int, int> count = new Dictionary<int, int>();
+            count[item]++;
+        }
 
-            // 인벤토리 개수 세기
-            foreach (int item in player.Inventory)
-            {
-                if (!count.ContainsKey(item))
-                    count[item] = 0;
+        // 제출 카드 검증
+        foreach (int item in Items)
+        {
+            if (!count.ContainsKey(item) || count[item] == 0)
+                return false;
 
-                count[item]++;
-            }
-
-            // 제출 카드 검증
-            foreach (int item in Items)
-            {
-                if (!count.ContainsKey(item) || count[item] == 0)
-                    return false;
-
-                count[item]--;
-            }
+            count[item]--;
         }
 
         GameManager.Instance.AddProducts(Items);

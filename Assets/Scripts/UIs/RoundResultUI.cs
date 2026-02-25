@@ -32,7 +32,6 @@ public class RoundResultUI : PhaseUI
             _players[i].UpdateMoney(player.Money);
             _players[i].UpdateName(player.Name);
             _players[i].gameObject.SetActive(true);
-            i++;
 
             int delta = 0;
             if (GameManager.Instance.Benefits.Keys.Contains(player.ActorNumber))
@@ -49,6 +48,7 @@ public class RoundResultUI : PhaseUI
             _deltas[i].text = $"({delta})";
             _deltas[i].color = delta > 0 ? Color.green : Color.red;
             _deltas[i].gameObject.SetActive(true);
+            i++;
         }
 
         StartCoroutine(nameof(NextPhase));

@@ -32,16 +32,33 @@ public class AsyncPhasePacket : RPCPacket
         if (!PhotonNetwork.IsMasterClient) return false;
 
         GameManager.Instance.FindPlayer(ActorNumber).IsActionFinished = true;
-        Debug.Log(ActorNumber);
 
         foreach (var player in GameManager.Instance.Players)
         {
             if (player.IsActionFinished == false) return false;
         }
 
+        var phase = GameManager.Instance.Phase;
+
         foreach (var player in GameManager.Instance.Players)
         {
             player.IsActionFinished = false;
+
+            Phase nextPhase = phase switch
+            {
+                Phase.InLobby => Phase.TravelSelection,
+                Phase.TravelSelection => Phase.Travel,
+                Phase.Travel => Phase.GoHome,
+                Phase.GoHome => GameManager.Instance.MustTravel ? Phase.TravelSelection : Phase.Vote,
+                Phase.Vote => Phase.VoteResult,
+                Phase.VoteResult => Phase.Feed,
+                Phase.Feed => Phase.Calculate,
+                Phase.Calculate => Phase.RoundResult,
+                Phase.RoundResult => GameManager.Instance.Round < GameManager.Instance.Config.Round ? Phase.TravelSelection : Phase.GameResult,
+                _ => Phase.InLobby,
+            };
+
+            RPCManager.Instance.photonView.RPC(nameof(RPCManager.RPC_Apply), RpcTarget.All, PacketType.UpdatePhase, new object[] { player.ActorNumber, nextPhase });
         }
 
         return true;
@@ -49,22 +66,6 @@ public class AsyncPhasePacket : RPCPacket
 
     public override void Response()
     {
-        var phase = GameManager.Instance.Phase;
-        Phase nextPhase = phase switch {
-            Phase.InLobby => Phase.TravelSelection,
-            Phase.TravelSelection => Phase.Travel,
-            Phase.Travel => Phase.GoHome,
-            Phase.GoHome => GameManager.Instance.MustTravel ? Phase.TravelSelection : GameManager.Instance.Player.IsLeader ? Phase.Vote : Phase.VoteWait,
-            Phase.Vote or Phase.VoteWait => Phase.VoteResult,
-            Phase.VoteResult => GameManager.Instance.Player.HasShipTicket ? Phase.Feed : Phase.FeedWait,
-            Phase.Feed or Phase.FeedWait => Phase.Calculate,
-            Phase.Calculate => Phase.RoundResult,
-            Phase.RoundResult => GameManager.Instance.Round < GameManager.Instance.Config.Round ? Phase.TravelSelection : Phase.GameResult,
-            _ => Phase.InLobby,
-        };
-
-        GameManager.Instance.SetPhase(nextPhase);
-
         UIManager.Instance.cover.gameObject.SetActive(false);
     }
 }

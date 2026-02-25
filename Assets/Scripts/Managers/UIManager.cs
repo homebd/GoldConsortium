@@ -31,7 +31,7 @@ public class UIManager : Singleton<UIManager>
                 GameManager.Instance.AddListener(Phase.Travel, true, hud.ShowRound);
                 GameManager.Instance.AddListener(Phase.GoHome, true, hud.UpdateArea);
                 GameManager.Instance.AddListener(Phase.Travel, true, hud.UpdateArea);
-                GameManager.Instance.AddListener(Phase.Vote, true, () => { if (true) hud.HideRound(); }); // 리더가 아니 때만 끔
+                GameManager.Instance.AddListener(Phase.Vote, true, () => { if (true) hud.HideRound(); });
                 GameManager.Instance.AddListener(Phase.VoteResult, false, hud.ShowRound);
                 GameManager.Instance.AddListener(Phase.Feed, true, () => hud.SetInventoryInteractable(true));
                 GameManager.Instance.AddListener(Phase.Feed, false, () => hud.SetInventoryInteractable(false));
@@ -48,25 +48,40 @@ public class UIManager : Singleton<UIManager>
 
     public void ShowPhaseUI(Phase phase)
     {
-        if (!_phaseUI.TryGetValue(phase, out PhaseUI ui))
+        if (!TryResolvePhaseUI(phase, out PhaseUI ui))
         {
             Debug.LogError("UI를 찾을 수 없습니다.");
+            return;
         }
 
         if (!ui.gameObject.scene.IsValid())
         {
             ui = Instantiate(ui);
-            _phaseUI[phase] = ui;
+            _phaseUI[ui.Phase] = ui;
         }
 
         ui.gameObject.SetActive(true);
     }
+
     public void HidePhaseUI(Phase phase)
     {
-        if (!_phaseUI.TryGetValue(phase, out PhaseUI ui)) return;
+        if (!TryResolvePhaseUI(phase, out PhaseUI ui)) return;
 
         if (!ui.gameObject.scene.IsValid()) return;
 
         ui.gameObject.SetActive(false);
+    }
+
+    private bool TryResolvePhaseUI(Phase phase, out PhaseUI ui)
+    {
+        ui = null;
+
+        Phase resolved = phase;
+        if (phase == Phase.Vote && !GameManager.Instance.Player.IsLeader)
+            resolved = Phase.VoteWait;
+        else if (phase == Phase.Feed && !GameManager.Instance.Player.HasShipTicket)
+            resolved = Phase.FeedWait;
+
+        return _phaseUI.TryGetValue(resolved, out ui);
     }
 }

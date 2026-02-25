@@ -22,7 +22,6 @@ public class VoteResultUI : PhaseUI
         {
             if (!player.HasShipTicket)
             {
-                i++;
                 continue;
             }
 

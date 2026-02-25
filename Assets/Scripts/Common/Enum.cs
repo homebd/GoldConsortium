@@ -28,5 +28,6 @@ namespace Game.Enum
         GiveItem,
         SetLeader,
         ChangeIcon,
+        UpdatePhase,
     }
 }
