@@ -30,6 +30,11 @@ public class ChangeMoneyPacket : RPCPacket
     {
         if (!PhotonNetwork.IsMasterClient) return false;
 
+        return true;
+    }
+
+    public override void Response()
+    {
         if (!GameManager.Instance.Benefits.ContainsKey(ActorNumber))
         {
             GameManager.Instance.Benefits[ActorNumber] = Money;
@@ -39,11 +44,6 @@ public class ChangeMoneyPacket : RPCPacket
             GameManager.Instance.Benefits[ActorNumber] += Money;
         }
 
-        return true;
-    }
-
-    public override void Response()
-    {
         GameManager.Instance.FindPlayer(ActorNumber).Money += Money;
         if (ActorNumber == GameManager.Instance.Player.ActorNumber)
             UIManager.Instance.hud.UpdateMoney();

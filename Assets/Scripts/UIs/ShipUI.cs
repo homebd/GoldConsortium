@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,6 +7,7 @@ public class ShipUI : PhaseUI
 {
     [SerializeField] private List<ItemSlot> _inventory;
     [SerializeField] private Button _submit;
+    [SerializeField] private TextMeshProUGUI _submittedValueText;
 
     private void Awake()
     {
@@ -34,9 +36,21 @@ public class ShipUI : PhaseUI
 
     public void UpdateInventory()
     {
+        int totalValue = 0;
+
         for (int i = 0; i < _inventory.Count; i++)
         {
-            _inventory[i].UpdateItem(GameManager.Instance.Player.Ship[i]);
+            int itemId = GameManager.Instance.Player.Ship[i];
+            _inventory[i].UpdateItem(itemId);
+
+            if (itemId >= 0)
+            {
+                var item = GameManager.Instance.Items.GetItem(itemId);
+                if (item != null) totalValue += item.Value;
+            }
         }
+
+        if (_submittedValueText != null)
+            _submittedValueText.text = $"출하 가치: {totalValue}";
     }
 }

@@ -14,6 +14,8 @@ namespace Game.Data
         public int[] Inventory;
         public int[] Ship;
         public bool HasShipTicket;
+        public bool HasReceivedTravelReward;
+        public bool HasSubmittedShipment;
         public bool IsActionFinished { get; set; }
         public int IconNum;
 

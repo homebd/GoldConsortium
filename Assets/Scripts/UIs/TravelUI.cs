@@ -17,6 +17,7 @@ public class TravelUI : PhaseUI
     private int _curMember;
     private float _time;
     private bool _isTimeOver;
+    private bool _hasSubmittedOption;
 
     private void Awake()
     {
@@ -60,6 +61,7 @@ public class TravelUI : PhaseUI
 
         _time = time;
         _isTimeOver = false;
+        _hasSubmittedOption = false;
     }
 
     private void Update()
@@ -69,7 +71,9 @@ public class TravelUI : PhaseUI
         if (_time < 0f)
         {
             _isTimeOver = true;
-            SelectOption(0);
+
+            if (!_hasSubmittedOption)
+                SelectOption(0);
         }
 
         _time -= Time.deltaTime;
@@ -78,9 +82,12 @@ public class TravelUI : PhaseUI
 
     public void SelectOption(int index)
     {
+        if (_hasSubmittedOption) return;
+
         if (GameManager.Instance.Player.AreaIndex != 4
             && index == 1 && GameManager.Instance.Player.Money < 2) return;
 
+        _hasSubmittedOption = true;
         GameManager.Instance.SelectOption(index);
 
         GameManager.Instance.AsyncPhase();

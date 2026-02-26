@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -20,10 +19,15 @@ public class RoundResultUI : PhaseUI
             player.gameObject.SetActive(false);
         }
 
-        _round.text = $"{GameManager.Instance.Round}¶ó¿îµå Á¾·á";
+        _round.text = $"{GameManager.Instance.Round}ë¼ìš´ë“œ ê²°ê³¼";
 
-        var players = GameManager.Instance.Players.ToList();
-        players.Sort((a,b) => (b.Money - a.Money));
+        List<Game.Data.Player> players = new List<Game.Data.Player>();
+        foreach (var player in GameManager.Instance.Players)
+        {
+            players.Add(player);
+        }
+
+        players.Sort((a, b) => b.Money - a.Money);
 
         int i = 0;
         foreach (var player in players)
@@ -33,16 +37,18 @@ public class RoundResultUI : PhaseUI
             _players[i].UpdateName(player.Name);
             _players[i].gameObject.SetActive(true);
 
-            int delta = 0;
-            if (GameManager.Instance.Benefits.Keys.Contains(player.ActorNumber))
+            int delta;
+            if (!GameManager.Instance.Benefits.TryGetValue(player.ActorNumber, out delta))
             {
-                delta = GameManager.Instance.Benefits[player.ActorNumber];
+                delta = 0;
             }
 
             if (delta == 0)
             {
                 _deltas[i].text = "";
                 _deltas[i].gameObject.SetActive(false);
+                i++;
+                continue;
             }
 
             _deltas[i].text = $"({delta})";

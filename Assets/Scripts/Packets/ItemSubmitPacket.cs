@@ -30,34 +30,52 @@ public class ItemSubmitPacket : RPCPacket
     public override bool Check()
     {
         if (!PhotonNetwork.IsMasterClient) return false;
-        
+
         var player = GameManager.Instance.FindPlayer(ActorNumber);
 
+        if (player == null) return false;
         if (!player.HasShipTicket) return false;
+        if (player.HasSubmittedShipment) return false;
+
+        var submittedItems = new List<int>();
+        for (int i = 0; i < Items.Length; i++)
+        {
+            if (Items[i] != -1)
+                submittedItems.Add(Items[i]);
+        }
 
         Dictionary<int, int> count = new Dictionary<int, int>();
 
-        // 인벤토리 개수 세기
-        foreach (int item in player.Inventory)
+        bool isMasterSubmit = player.ActorNumber == GameManager.Instance.Player.ActorNumber;
+
+        var validationSource = isMasterSubmit ? player.Ship : player.Inventory;
+
+        foreach (int item in validationSource)
         {
+            if (item == -1) continue;
+
             if (!count.ContainsKey(item))
                 count[item] = 0;
 
             count[item]++;
         }
 
-        // 제출 카드 검증
-        foreach (int item in Items)
+        for (int i = 0; i < submittedItems.Count; i++)
         {
+            int item = submittedItems[i];
             if (!count.ContainsKey(item) || count[item] == 0)
                 return false;
 
             count[item]--;
         }
 
-        GameManager.Instance.AddProducts(Items);
-        GameManager.Instance.Shippers.Add(player.ActorNumber);
+        GameManager.Instance.AddProducts(submittedItems.ToArray());
 
+        if (!GameManager.Instance.Shippers.Contains(player.ActorNumber))
+            GameManager.Instance.Shippers.Add(player.ActorNumber);
+
+        player.HasSubmittedShipment = true;
+        player.HasShipTicket = false;
 
         return true;
     }
@@ -65,23 +83,34 @@ public class ItemSubmitPacket : RPCPacket
     public override void Response()
     {
         var player = GameManager.Instance.FindPlayer(ActorNumber);
+        if (player == null) return;
 
         foreach (int deleted in Items)
         {
+            if (deleted == -1) continue;
+
             for (int i = 0; i < player.Inventory.Length; i++)
             {
                 if (player.Inventory[i] == deleted)
                 {
                     player.Inventory[i] = -1;
-                    continue;
+                    break;
                 }
             }
         }
 
-        for(int i = 0; i < player.Ship.Length; i++)
+        for (int i = 0; i < player.Ship.Length; i++)
         {
             player.Ship[i] = -1;
         }
+
         player.HasShipTicket = false;
+        player.HasSubmittedShipment = true;
+
+        if (GameManager.Instance.Player.ActorNumber == ActorNumber)
+        {
+            UIManager.Instance.hud.UpdateInventory();
+            UIManager.Instance.ship.UpdateInventory();
+        }
     }
 }

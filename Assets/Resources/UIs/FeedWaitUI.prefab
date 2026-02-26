@@ -11,8 +11,7 @@ GameObject:
   - component: {fileID: 1076623627286394228}
   - component: {fileID: 2192951932139916525}
   - component: {fileID: 6176215236528821727}
-  - component: {fileID: 3805954984705005111}
-  - component: {fileID: 6500364698400801198}
+  - component: {fileID: 6361524511469367928}
   m_Layer: 5
   m_Name: FeedWaitUI
   m_TagString: Untagged
@@ -86,7 +85,7 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 0
---- !u!114 &3805954984705005111
+--- !u!114 &6361524511469367928
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -95,27 +94,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 315507044772854064}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Script: {fileID: 11500000, guid: cbf44631cb31da04f8e3c460051aa3cd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
---- !u!114 &6500364698400801198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 315507044772854064}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8831afca7f2ddee4ca80125bea800347, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GoHomeUI
+  m_EditorClassIdentifier: Assembly-CSharp::PhaseWaitStatusUI
   <Phase>k__BackingField: 11
+  _waitType: 1
+  _statusText: {fileID: 3160158213318519873}
+  _refreshInterval: 0.2
 --- !u!1 &6595392754390028337
 GameObject:
   m_ObjectHideFlags: 0
@@ -307,7 +292,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8433610289299933927}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 

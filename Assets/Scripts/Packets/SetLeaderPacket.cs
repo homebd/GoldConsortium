@@ -32,6 +32,13 @@ public class SetLeaderPacket : RPCPacket
 
     public override void Response()
     {
-        GameManager.Instance.FindPlayer(ActorNumber).IsLeader = true;
+        foreach (var player in GameManager.Instance.Players)
+        {
+            player.IsLeader = false;
+        }
+
+        var leader = GameManager.Instance.FindPlayer(ActorNumber);
+        if (leader != null)
+            leader.IsLeader = true;
     }
 }

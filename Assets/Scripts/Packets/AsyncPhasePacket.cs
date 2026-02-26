@@ -39,24 +39,34 @@ public class AsyncPhasePacket : RPCPacket
         }
 
         var phase = GameManager.Instance.Phase;
+        Phase nextPhase = phase switch
+        {
+            Phase.InLobby => Phase.TravelSelection,
+            Phase.TravelSelection => Phase.Travel,
+            Phase.Travel => Phase.GoHome,
+            Phase.GoHome => GameManager.Instance.MustTravel ? Phase.TravelSelection : Phase.Vote,
+            Phase.Vote => Phase.VoteResult,
+            Phase.VoteResult => Phase.Feed,
+            Phase.Feed => Phase.Calculate,
+            Phase.Calculate => Phase.RoundResult,
+            Phase.RoundResult => GameManager.Instance.Round < GameManager.Instance.Config.Round ? Phase.TravelSelection : Phase.GameResult,
+            _ => Phase.InLobby,
+        };
 
         foreach (var player in GameManager.Instance.Players)
         {
-            player.IsActionFinished = false;
+            bool autoReady = false;
 
-            Phase nextPhase = phase switch
+            if (nextPhase == Phase.Vote)
             {
-                Phase.InLobby => Phase.TravelSelection,
-                Phase.TravelSelection => Phase.Travel,
-                Phase.Travel => Phase.GoHome,
-                Phase.GoHome => GameManager.Instance.MustTravel ? Phase.TravelSelection : Phase.Vote,
-                Phase.Vote => Phase.VoteResult,
-                Phase.VoteResult => Phase.Feed,
-                Phase.Feed => Phase.Calculate,
-                Phase.Calculate => Phase.RoundResult,
-                Phase.RoundResult => GameManager.Instance.Round < GameManager.Instance.Config.Round ? Phase.TravelSelection : Phase.GameResult,
-                _ => Phase.InLobby,
-            };
+                autoReady = !player.IsLeader;
+            }
+            else if (nextPhase == Phase.Feed)
+            {
+                autoReady = !player.HasShipTicket;
+            }
+
+            player.IsActionFinished = autoReady;
 
             RPCManager.Instance.photonView.RPC(nameof(RPCManager.RPC_Apply), RpcTarget.All, PacketType.UpdatePhase, new object[] { player.ActorNumber, nextPhase });
         }

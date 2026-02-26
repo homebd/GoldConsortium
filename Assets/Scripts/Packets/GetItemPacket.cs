@@ -34,6 +34,9 @@ public class GetItemPacket : RPCPacket
         var player = GameManager.Instance.FindPlayer(ActorNumber);
 
         if (player == null) return false;
+        if (player.HasReceivedTravelReward) return false;
+
+        player.HasReceivedTravelReward = true;
 
         if (player.AreaIndex == 4) // ÈÞ½Ä
         {

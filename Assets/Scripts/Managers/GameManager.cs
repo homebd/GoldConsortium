@@ -3,7 +3,6 @@ using Game.Enum;
 using Photon.Pun;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
@@ -21,6 +20,18 @@ public class GameManager : Singleton<GameManager>
     public IReadOnlyCollection<Player> Players => _players.Values;
     public Player Player => _players[_actorNumber];
     public Player FindPlayer(int actorNumber) => _players.ContainsKey(actorNumber) ? _players[actorNumber] : null;
+    public Player Leader
+    {
+        get
+        {
+            foreach (var player in _players.Values)
+            {
+                if (player.IsLeader) return player;
+            }
+
+            return null;
+        }
+    }
 
     private int _actorNumber;
 
@@ -52,6 +63,15 @@ public class GameManager : Singleton<GameManager>
             _players[p.ActorNumber] = player;
 
             AddListener(Phase.TravelSelection, true, () => player.hasSelected = false);
+            AddListener(Phase.Travel, true, () => player.HasReceivedTravelReward = false);
+            AddListener(Phase.Feed, true, () =>
+            {
+                player.HasSubmittedShipment = false;
+                for (int i = 0; i < player.Ship.Length; i++)
+                {
+                    player.Ship[i] = -1;
+                }
+            });
         }
 
         _actorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
@@ -69,7 +89,17 @@ public class GameManager : Singleton<GameManager>
         if (Round == 1)
         {
             var random = UnityEngine.Random.Range(0, Players.Count);
-            leader = Players.ToList()[random].ActorNumber;
+            int index = 0;
+            foreach (var player in Players)
+            {
+                if (index == random)
+                {
+                    leader = player.ActorNumber;
+                    break;
+                }
+
+                index++;
+            }
         }
         else
         {
